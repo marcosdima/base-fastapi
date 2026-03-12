@@ -1,4 +1,5 @@
 from sqlmodel import Field
+
 from .base_model import BaseModel
 
 class User(BaseModel, table=True):

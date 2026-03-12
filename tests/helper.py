@@ -44,4 +44,13 @@ def create_user(client, username: str, password: str) -> dict:
 
 def create_default_user(client) -> dict:
     response = post(client, sign_in_route, user_default_data)
-    return response.json()
+    if response.status_code == 201:
+        return response.json()
+
+    # Tests can share state in the same sqlite file; if the default user already
+    # exists, return a valid user payload by logging in with the same credentials.
+    body = response.json()
+    if response.status_code == 400 and body.get('detail') == 'Username already exists':
+        return post(client, login_route, user_default_data).json()
+
+    return body
