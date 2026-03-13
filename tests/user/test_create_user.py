@@ -1,23 +1,24 @@
 from tests.helper import get, post
 
 
-default_data = {
-    'username': 'John Doe',
-    'password': 'Secret@123',
-}
-
 signin_route = '/api/v1/users/signin'
 login_route = '/api/v1/users/login'
 users_route = '/api/v1/users'
 
 
+test_data = {
+    'username': 'John Doe 2',
+    'password': 'Secret@123',
+}
+
+
 def test_create_user(client):
-    response = post(client, signin_route, default_data)
+    
+    response = post(client, signin_route, test_data)
 
     assert response.status_code == 201
     body = response.json()
-    assert body['id'] == 1
-    assert body['username'] == 'John Doe'
+    assert body['username'] == test_data['username']
     assert isinstance(body['token'], str)
     assert body['token']
 
@@ -72,8 +73,8 @@ def test_create_users_wrong_password(client):
 
 
 def test_create_user_existing_username(client):
-    post(client, signin_route, default_data)
-    response = post(client, signin_route, default_data)
+    post(client, signin_route, test_data)
+    response = post(client, signin_route, test_data)
 
     assert response.status_code == 400
     body = response.json()

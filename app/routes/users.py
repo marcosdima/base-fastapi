@@ -1,9 +1,7 @@
-from typing import Annotated
-from secrets import token_urlsafe
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, field_validator
 from .. import services
+from .dependencies.auth import create_access_token
 
 
 router = APIRouter()
@@ -41,7 +39,7 @@ def _build_user_out(user) -> dict:
     return {
         'id': user.id,
         'username': user.username,
-        'token': token_urlsafe(24),
+        'token': create_access_token(user_id=user.id, username=user.username),
     }
     
 

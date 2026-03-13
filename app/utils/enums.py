@@ -1,0 +1,9 @@
+from enum import StrEnum
+
+class PermissionName(StrEnum):
+    REMOVE_USER = "REMOVE_USER"
+    GET_USERS = "GET_USERS"
+    ASSIGN_ROLES = "ASSIGN_ROLES"
+    CREATE_ROLES = "CREATE_ROLES"
+    REMOVE_USER_ROLE = "REMOVE_USER_ROLE"
+    GET_ROLES = "GET_ROLES"

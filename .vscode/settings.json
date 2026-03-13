@@ -23,6 +23,8 @@
     "**/.venv"
   ],
   "python.testing.pytestArgs": [
+    "-s",
+    "-vv",
     "tests"
   ],
   "python.testing.unittestEnabled": false,
