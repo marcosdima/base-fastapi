@@ -21,6 +21,14 @@ DEFAULT_USER_CREDENTIALS = {
     'username': DEFAULT_USERNAME,
     'password': DEFAULT_PASSWORD,
 }
+
+# Secondary user data for tests that require multiple users.
+SECONDARY_USERNAME = 'Jane Doe'
+SECONDARY_PASSWORD = 'AnotherSecret@123'
+SECONDARY_USER_CREDENTIALS = {
+    'username': SECONDARY_USERNAME,
+    'password': SECONDARY_PASSWORD,
+}
     
 
 def __get_authorization_header(token: str) -> dict:
@@ -150,3 +158,21 @@ def create_default_user(client) -> dict:
         return user
 
     raise AssertionError(f'create_default_user failed: status={response.status_code}, body={body}')
+
+
+def create_secondary_user(client) -> dict:
+    response = post(client, sign_in_route, SECONDARY_USER_CREDENTIALS)
+    if response.status_code == 201:
+        return response.json()
+
+    # Tests can share state in the same sqlite file; if the secondary user already
+    # exists, return a valid user payload by logging in with the same credentials.
+    body = response.json()
+    if response.status_code == 400 and body.get('detail') == 'Username already exists':
+        login_response = post(client, login_route, SECONDARY_USER_CREDENTIALS)
+        if login_response.status_code != 200:
+            raise AssertionError(f'create_secondary_user failed to login existing user: {login_response.json()}')
+
+        return login_response.json()
+
+    raise AssertionError(f'create_secondary_user failed: status={response.status_code}, body={body}')

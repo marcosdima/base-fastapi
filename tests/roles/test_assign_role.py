@@ -5,8 +5,10 @@ from tests.helper import (
     ROLES_ROUTE,
     assign_role,
     create_default_user,
+    create_user,
     delete,
     grant_permissions_to_test_role,
+    create_secondary_user,
 )
 
 
@@ -47,3 +49,36 @@ def test_remove_role(client, db_session):
     remove_response = delete(client, remove_role_route, token=user['token'])
     assert remove_response.status_code == 200
     assert remove_response.json()['detail'] == 'Role removed successfully'
+
+
+def test_assign_role_without_permissions(client, db_session):
+    user = create_default_user(client)
+    role = _get_or_create_test_role(db_session)
+
+    response = assign_role(client, user['id'], role.id, user['token'])
+
+    assert response.status_code == 403
+    assert response.json()['detail'] == 'You do not have permission to assign roles'
+
+
+def test_remove_role_without_permissions(client, db_session):
+    user = create_default_user(client)
+
+    response = delete(client, f"{ROLES_ROUTE}/{user['id']}/remove", token=user['token'])
+
+    assert response.status_code == 403
+    assert response.json()['detail'] == 'You do not have permission to remove roles'
+
+
+def test_remove_role_without_role(client, db_session):
+    grant_permissions_to_test_role(['REMOVE_USER_ROLE'])
+    user = create_default_user(client)
+    role = _get_or_create_test_role(db_session)
+
+    # Create secondary user.
+    secondary_user = create_secondary_user(client)  
+    assign_role(client, secondary_user['id'], role.id, user['token'])  # Assign role to secondary user.
+
+    response = delete(client, f"{ROLES_ROUTE}/{secondary_user['id']}/remove", token=user['token'])
+    assert response.status_code == 404
+    assert response.json()['detail'] == 'Role assignment not found'
