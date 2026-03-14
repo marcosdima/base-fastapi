@@ -19,27 +19,24 @@ from app.db import engine
 from app.main import app
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='function', autouse=True)
 def setup_test_db():
-	if TEST_DB_PATH.exists():
-		TEST_DB_PATH.unlink()
+    SQLModel.metadata.drop_all(engine)
+    SQLModel.metadata.create_all(engine)
 
-	SQLModel.metadata.create_all(engine)
+    yield
 
-	yield
-
-	if TEST_DB_PATH.exists():
-		TEST_DB_PATH.unlink()
+    SQLModel.metadata.drop_all(engine)
 
 
 @pytest.fixture(scope='function')
 def db_session():
-	with Session(engine) as session:
-		yield session
-		session.rollback()
+    with Session(engine) as session:
+        yield session
+        session.rollback()
 
 
 @pytest.fixture(scope='function')
 def client(setup_test_db):
-	with TestClient(app) as c:
-		yield c
+    with TestClient(app) as c:
+        yield c
