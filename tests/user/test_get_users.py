@@ -4,7 +4,7 @@ from tests.helper import USERS_ROUTE, create_default_user, get
 def test_get_users(client):
     user = create_default_user(client)
 
-    response = get(client, f'{USERS_ROUTE}/users')
+    response = get(client, USERS_ROUTE)
 
     assert response.status_code == 200
     body = response.json()

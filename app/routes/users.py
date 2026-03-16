@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field, field_validator
 from .. import services
-from .dependencies.auth import create_access_token
+from .dependencies.auth import create_access_token, parse_token_and_get_user
 
 
 router = APIRouter()
@@ -41,6 +41,7 @@ class UserOut(User):
 
 class UserPublic(User):
     id: int = Field(..., json_schema_extra={'example': 1})
+    username: str = Field(..., json_schema_extra={'example': 'john_doe'})
 
 
 def _build_user_out(user) -> dict:
@@ -84,7 +85,12 @@ async def login(form_data: UserLoginIn):
     return _build_user_out(user)
 
 
-@router.get('/users', response_model=list[UserPublic])
+@router.get('/', response_model=list[UserPublic])
 async def get_users():
     users = services.user_service.get_all()
     return [_build_user_public(user) for user in users]
+
+
+@router.get('/me', response_model=UserPublic)
+async def get_current_user(current_user: object = Depends(parse_token_and_get_user),):
+    return _build_user_public(current_user)
