@@ -71,7 +71,10 @@ def verify_token(token: str) -> dict:
         signature_input,
         hashlib.sha256,
     ).digest()
-    provided_signature = _b64url_decode(encoded_signature)
+    try:
+        provided_signature = _b64url_decode(encoded_signature)
+    except ValueError as exc:
+        raise unauthorized from exc
 
     if not hmac.compare_digest(provided_signature, expected_signature):
         raise unauthorized

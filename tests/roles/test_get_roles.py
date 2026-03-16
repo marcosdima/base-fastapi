@@ -25,3 +25,10 @@ def test_get_roles_without_permissions(client):
     response = get(client, ROLES_ROUTE, token=user['token'])
 
     assert response.status_code == 403
+
+
+def test_get_roles_with_malformed_token(client):
+    response = get(client, ROLES_ROUTE, token='a.b.c')
+
+    assert response.status_code == 401
+    assert response.json()['detail'] == 'Invalid or expired token'

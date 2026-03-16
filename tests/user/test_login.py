@@ -25,7 +25,7 @@ def test_login_user_wrong_password(client):
     create_default_user(client)
     
     modified_data = user_default_data.copy()
-    modified_data['password'] = 'WrongPassword@123'
+    modified_data['password'] = 'rongassword@123'
     response = post(
         client,
         login_route,
