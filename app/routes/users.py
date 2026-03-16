@@ -30,9 +30,17 @@ class UserIn(User):
         return v
 
 
+class UserLoginIn(User):
+    password: str = Field(..., json_schema_extra={'example': 'user_password'})
+
+
 class UserOut(User):
     id: int = Field(..., json_schema_extra={'example': 1})
     token: str = Field(..., json_schema_extra={'example': 'jwt_token_example'})
+
+
+class UserPublic(User):
+    id: int = Field(..., json_schema_extra={'example': 1})
 
 
 def _build_user_out(user) -> dict:
@@ -40,6 +48,13 @@ def _build_user_out(user) -> dict:
         'id': user.id,
         'username': user.username,
         'token': create_access_token(user_id=user.id, username=user.username),
+    }
+
+
+def _build_user_public(user) -> dict:
+    return {
+        'id': user.id,
+        'username': user.username,
     }
     
 
@@ -57,7 +72,7 @@ async def signin(form_data: UserIn):
 
 
 @router.post('/login', response_model=UserOut)
-async def login(form_data: UserIn):
+async def login(form_data: UserLoginIn):
     user = services.user_service.get_by_username(form_data.username)
     if not user:
         raise HTTPException(status_code=404, detail='Username not found')
@@ -69,6 +84,7 @@ async def login(form_data: UserIn):
     return _build_user_out(user)
 
 
-@router.get('/users', response_model=list[UserOut])
+@router.get('/users', response_model=list[UserPublic])
 async def get_users():
-    return services.user_service.get_all()
+    users = services.user_service.get_all()
+    return [_build_user_public(user) for user in users]
