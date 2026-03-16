@@ -7,8 +7,7 @@ Create Date: 2026-03-12 16:08:46.764392
 """
 from alembic import op
 import sqlalchemy as sa
-from ....utils import PermissionName
-
+from app.utils import PermissionName
 
 
 # revision identifiers, used by Alembic.
