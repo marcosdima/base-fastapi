@@ -20,7 +20,7 @@ def _build_db_url(raw_url: str) -> str:
     return urlunparse(parsed._replace(query=clean_query))
 
 
-engine = create_engine(_build_db_url(settings.POSTGRES_URL), echo=True)
+engine = create_engine(_build_db_url(settings.POSTGRES_URL), echo=False)
 
 
 def create_db_and_tables() -> None:
