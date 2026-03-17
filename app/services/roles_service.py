@@ -8,7 +8,7 @@ from sqlmodel import select
 password_hash = PasswordHash.recommended()
 
 
-class RoleService(BaseService):
+class RoleService(BaseService[Role]):
     def __init__(self, session):
         super().__init__(model=Role, session=session)
 

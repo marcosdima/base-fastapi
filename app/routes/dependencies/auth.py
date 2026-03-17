@@ -10,6 +10,8 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from app.models import User
+
 from ... import services
 from ...utils.settings import settings
 
@@ -97,7 +99,7 @@ def verify_token(token: str) -> dict:
 
 def parse_token_and_get_user(
     credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security)],
-):
+) -> User:
     if not credentials or not credentials.credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

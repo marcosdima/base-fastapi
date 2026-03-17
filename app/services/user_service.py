@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 password_hash = PasswordHash.recommended()
 
 
-class UserService(BaseService):
+class UserService(BaseService[User]):
     def __init__(self, session):
         super().__init__(model=User, session=session)
 
